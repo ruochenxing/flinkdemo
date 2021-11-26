@@ -1,0 +1,16 @@
+增量聚合函数虽然性能好, 但是灵活性不如全量函数, 例如对窗口状态数据的操作以及对窗口中的元数据信息的获取. 
+但是如果用 ProcessWindowFunction 去完成一些基础的增量计算相对比较浪费资源, 因此可以两者结合的方式来实现.
+
+
+input.keyBy(x -> x.f1)
+    .timeWindow(Time.seconds(10), Time.seconds(1))
+    // 第一个Function为 ReduceFunction, 取窗口的最小值
+    .reduce((r1, r2) -> {
+    return r1.f0 < r2.f0 ? r1 : r2;
+    // 第二个Function为 ProcessWindowFunction, 获取窗口的时间信息
+    }, new ProcessWindowFunction<Tuple2<Long, Long>, String, Long, TimeWindow>() {
+    @Override
+    public void process(Long aLong, Context context, Iterable<Tuple2<Long, Long>>       elements, Collector<String> out) throws Exception {
+    out.collect("window: " + context.window()); 
+        }
+    }).print();

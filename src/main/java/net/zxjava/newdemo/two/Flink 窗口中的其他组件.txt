@@ -1,0 +1,26 @@
+除了 Window Assigner 和 Window Function外,Flink的窗口中还有 Triger窗口触发器, 其负责判断何时将窗口中的数据取出做计算, flink已经默认为各种类型的窗口实现了 triger. 
+用户也可以自己手动指定. Evictors 是数据剔除器, 目的是把窗口中的数据按照需求做一定的剔除. 
+Flink也有 API 针对延迟数据做处理, 延迟的数据可以丢弃也可以通过sideOutputLateDate( ) 方法处理.
+
+1. Triger 窗口触发器
+EventTimeTrigger: 通过对比 watermark 和窗口 EndTime 确定是否触发窗口
+
+ProcessTimeTrigger: 通过对比 ProcessTime 和窗口 EndTime 确定是否触发窗口
+
+ContinuousEventTimeTrigger: 根据间隔时间周期性触发窗口
+
+ContinuousEventTimeTrigger: 同上, 区别是使用ProcessTime
+
+CountTrigger: 根据接入数量是否超过阈值
+
+DeltaTrigger: 根据计算出来的 Delta 指标是否超过指定的 Threshold
+
+PurgingTrigger: 可以将任意触发器作为参数转换为Purge类型触发器
+
+
+2. Evictors触发器
+CountEvictor: 保持固定数量的数据, 超过的剔除
+
+DeltaEvictor: 通过定义 delta 和 threshold , 计算两个数据之间的 delta 值, 超过则剔除
+
+TimeEvictor: 指定时间间隔, 将当前窗口中的最新元素的时间减去Interval, 然后将小于该结果的数据全部剔除
